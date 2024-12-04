@@ -1,34 +1,51 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+
+const gallery = document.getElementById('gallery');
+const loadingIndicator = document.getElementById('loading');
 
 let lightbox;
 
-export function renderGallery(images) {
-  const gallery = document.querySelector('.gallery');
-  const markup = images
-    .map(
-      ({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) =>
-        `<a href="${largeImageURL}" class="gallery-item">
-          <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-          <div class="info">
-            <p><b>Likes:</b> ${likes}</p>
-            <p><b>Views:</b> ${views}</p>
-            <p><b>Comments:</b> ${comments}</p>
-            <p><b>Downloads:</b> ${downloads}</p>
-          </div>
-        </a>`
-    )
-    .join('');
+export function showLoading() {
+  loadingIndicator.classList.remove('hidden');
+}
 
-  gallery.innerHTML = markup;
+export function hideLoading() {
+  loadingIndicator.classList.add('hidden');
+}
+
+export function renderImages(images) {
+  gallery.innerHTML = images.map(image => `
+    <li>
+      <a href="${image.largeImageURL}">
+        <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />
+        <div class="info">
+          <p><span>Likes:</span> <span class="value">${image.likes}</span></p>
+          <p><span>Views:</span> <span class="value">${image.views}</span></p>
+          <p><span>Comments:</span> <span class="value">${image.comments}</span></p>
+          <p><span>Downloads:</span> <span class="value">${image.downloads}</span></p>
+        </div>
+      </a>
+    </li>
+  `).join('');
 
   if (!lightbox) {
-    lightbox = new SimpleLightbox('.gallery a');
+    lightbox = new SimpleLightbox('#gallery a');
   } else {
     lightbox.refresh();
   }
 }
 
+
+export function showError(message) {
+  iziToast.error({
+    title: 'Error',
+    message,
+  });
+}
+
 export function clearGallery() {
-  document.querySelector('.gallery').innerHTML = '';
+  gallery.innerHTML = '';
 }
